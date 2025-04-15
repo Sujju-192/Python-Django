@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #eef2f3;
+      padding: 20px;
+    }
+    .card {
+      margin-bottom: 30px;
+    }
+    .delete-btn {
+      color: red;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 class="text-center mb-4">User Management Dashboard</h2>
+
+    <!-- Add User Form -->
+    <div class="card p-4 shadow-sm">
+      <h4>Add New User</h4>
+      <form id="addUserForm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Full Name" name="full_name" required>
+          </div>
+          <div class="col-md-3">
+            <input type="email" class="form-control" placeholder="Email" name="email" required>
+          </div>
+          <div class="col-md-2">
+            <input type="password" class="form-control" placeholder="Password" name="pass" required>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" name="user_type" required>
+              <option value="" disabled selected>User Type</option>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-success w-100">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Filter -->
+    <div class="mb-3">
+      <label for="filter" class="form-label">Filter by User Type:</label>
+      <select class="form-select w-25" id="filter" onchange="filterUsers()">
+        <option value="all">All</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <!-- User Table -->
+    <table class="table table-bordered table-striped shadow-sm bg-white" id="userTable">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>User Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="userBody">
+        {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.pass }}</td>
+          <td class="type">{{ user.user_type }}</td>
+          <td><span class="delete-btn" onclick="deleteRow(this)">Delete</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Filter table rows
+    function filterUsers() {
+      const type = document.getElementById('filter').value;
+      const rows = document.querySelectorAll('#userBody tr');
+
+      rows.forEach(row => {
+        const userType = row.querySelector('.type').innerText;
+        row.style.display = (type === 'all' || userType === type) ? '' : 'none';
+      });
+    }
+
+    // Add new user row (frontend only)
+    document.getElementById('addUserForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const full_name = form.full_name.value;
+      const email = form.email.value;
+      const pass = form.pass.value;
+      const user_type = form.user_type.value;
+
+      const table = document.getElementById('userBody');
+      const newRow = document.createElement('tr');
+      const newId = table.rows.length + 1;
+
+      newRow.innerHTML = `
+        <td>${newId}</td>
+        <td>${full_name}</td>
+        <td>${email}</td>
+        <td>${pass}</td>
+        <td class="type">${user_type}</td>
+        <td><span class="delete-btn" onclick="deleteRow(this)">Delete</span></td>
+      `;
+      table.appendChild(newRow);
+      form.reset();
+    });
+
+    // Delete user row
+    function deleteRow(element) {
+      element.closest('tr').remove();
+    }
+  </script>
+
+</body>
+</html>
